@@ -12,6 +12,7 @@ def index():
     return render_template('index.html')
 @application.route('/', methods=['POST'])
 def form_post():
+
     fid = request.form['fdata']
     lid = request.form['ldata']
 
