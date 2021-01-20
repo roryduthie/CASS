@@ -5,6 +5,10 @@ import copy
 import gmatch4py as gm
 import networkx as nx
 from fuzzywuzzy import fuzz
+import segeval
+import requests
+from bs4 import BeautifulSoup, SoupStrainer
+import bs4
 
 class Aifsim:
     @staticmethod
