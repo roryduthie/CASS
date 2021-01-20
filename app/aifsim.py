@@ -475,3 +475,19 @@ class Aifsim:
             match.replaceWithChildren()
 
         return xml_soup
+
+    @staticmethod
+    def get_segements(xml_soup):
+        segment_list = []
+        for i, tag in enumerate(xml_soup):
+            boundary_counter = i + 1
+            tag_text = ''
+            if 'span' in str(tag):
+                tag_text = tag.text
+            else:
+                tag_text = str(tag)
+
+            words = tag_text.split()
+            seg_len = len(words)
+            segment_list += seg_len * [boundary_counter]
+        return segment_list
