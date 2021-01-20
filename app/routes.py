@@ -31,6 +31,7 @@ def form_pos():
 
 @application.route('/results')
 def render_text():
+
     fid = session.get('fid', None)
     lid = session.get('lid', None)
     aifs = Aifsim()
