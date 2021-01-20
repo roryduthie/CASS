@@ -465,3 +465,13 @@ class Aifsim:
         return overall_score, text_mean, graph_mean
 
 
+    @staticmethod
+    def remove_html_tags(xml_soup):
+        for match in xml_soup.findAll('div'):
+            match.replaceWithChildren()
+        for match in xml_soup.findAll('p'):
+            match.replaceWithChildren()
+        for match in xml_soup.findAll('br'):
+            match.replaceWithChildren()
+
+        return xml_soup
