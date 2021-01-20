@@ -491,3 +491,13 @@ class Aifsim:
             seg_len = len(words)
             segment_list += seg_len * [boundary_counter]
         return segment_list
+
+    @staticmethod
+    def check_segment_length(seg_1, seg_2):
+        seg_1_len = len(seg_1)
+        seg_2_len = len(seg_2)
+
+        if seg_1_len == seg_2_len:
+            return True
+        else:
+            return False
