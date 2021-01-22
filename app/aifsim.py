@@ -362,15 +362,18 @@ class Aifsim:
         g_size = len(g_list)
         g1_size = len(g1_list)
 
+        switch_flag = False
+
 
         if g_size >= g1_size:
             mat = aifsim.loop_nodes(g_list, g1_list)
             rels, vals = aifsim.select_max_vals(mat, g1_size, g_list, g1_list)
         else:
+            switch_flag = True
             mat = aifsim.loop_nodes(g1_list, g_list)
             rels, vals = aifsim.select_max_vals(mat, g_size, g1_list, g_list)
 
-        return rels, vals
+        return rels, vals, switch_flag
 
 
     @staticmethod
@@ -409,7 +412,7 @@ class Aifsim:
             index_list.remove(index_tup[0])
             counter = counter + 1
         for vals in index_list:
-            lev_rels.append((g_list[vals],''))
+            lev_rels.append((g_list[vals],(0,'')))
             lev_vals.append(0)
         return lev_rels, lev_vals
 
@@ -447,7 +450,7 @@ class Aifsim:
         if rep_form == 'aif':
             g_inodes = centra.get_i_node_list(g_copy)
             g1_inodes = centra.get_i_node_list(g1_copy)
-            relsi, valsi = aifsim.text_sim_matrix(g_inodes, g1_inodes)
+            relsi, valsi, switched = aifsim.text_sim_matrix(g_inodes, g1_inodes)
             i_mean = aifsim.get_mean_of_list(valsi)
             text_mean = i_mean
         else:
@@ -455,8 +458,8 @@ class Aifsim:
             g1_inodes = centra.get_i_node_list(g1_copy)
             g_lnodes = centra.get_l_node_list(g_copy)
             g1_lnodes = centra.get_l_node_list(g1_copy)
-            relsi, valsi = aifsim.text_sim_matrix(g_inodes, g1_inodes)
-            relsl, valsl = aifsim.text_sim_matrix(g_lnodes, g1_lnodes)
+            relsi, valsi, switched = aifsim.text_sim_matrix(g_inodes, g1_inodes)
+            relsl, valsl, switched = aifsim.text_sim_matrix(g_lnodes, g1_lnodes)
             i_mean = aifsim.get_mean_of_list(valsi)
             l_mean = aifsim.get_mean_of_list(valsl)
             text_mean = aifsim.get_l_i_mean(l_mean, i_mean)
@@ -536,3 +539,58 @@ class Aifsim:
             win_diff = 1 - float(win_diff)
 
             return str(ss), str(pk), str(win_diff)
+    @staticmethod
+    def rels_to_dict(rels, switched):
+        new_list = []
+        for rel in rels:
+
+            id_1 = rel[0][0]
+            id_2 = rel[1][0]
+            text_1 = rel[0][1]
+            text_2 = rel[1][1]
+
+            if switched:
+
+                mat_dict = {'ID1': id_2, 'ID2': id_1, 'text1': text_2, 'text2': text_1}
+            else:
+                mat_dict = {'ID1': id_1, 'ID2': id_2, 'text1': text_1, 'text2': text_2}
+            new_list.append(mat_dict)
+        return new_list
+
+    @staticmethod
+    def get_loc_sim_matrix(graph, graph1):
+        centra = Centrality()
+        aifsim = Aifsim()
+
+
+        g_copy = graph.copy()
+        g1_copy = graph1.copy()
+
+
+        g_lnodes = centra.get_l_node_list(g_copy)
+        g1_lnodes = centra.get_l_node_list(g1_copy)
+        relsl, valsl, switched = aifsim.text_sim_matrix(g_lnodes, g1_lnodes)
+
+        rels_dict = aifsim.rels_to_dict(relsl, switched)
+
+        return rels_dict
+
+    @staticmethod
+    def get_prop_sim_matrix(graph, graph1):
+        centra = Centrality()
+        aifsim = Aifsim()
+
+
+        g_copy = graph.copy()
+        g1_copy = graph1.copy()
+
+
+        g_inodes = centra.get_i_node_list(g_copy)
+        g1_inodes = centra.get_i_node_list(g1_copy)
+        relsi, valsi, switched = aifsim.text_sim_matrix(g_inodes, g1_inodes)
+
+        #if switched the relations have been switched order so they need reversed when creating the dictionary
+
+        rels_dict = aifsim.rels_to_dict(relsi, switched)
+
+        return rels_dict
